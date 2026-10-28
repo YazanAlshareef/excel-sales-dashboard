@@ -459,9 +459,11 @@ for col, lab, f, nf in cards:
 
 ws["B10"] = "Month charts ignore the Month dropdown; country chart leaves out the United Kingdom (see Summary for its share)."
 ws["B10"].font = f_sub
+for r in range(11, 43):
+    ws.row_dimensions[r].height = 15  # fixed so charts (7.4 cm tall) never overlap
 
 
-def style_bar(ch, title, w=15.2, h=7.6):
+def style_bar(ch, title, w=15.2, h=7.4):
     ch.title = title
     ch.legend = None
     ch.width, ch.height = w, h
@@ -484,6 +486,7 @@ ch2.add_data(Reference(ws_calc, min_col=10, min_row=HR, max_row=HR + 10), titles
 ch2.set_categories(Reference(ws_calc, min_col=9, min_row=HR + 1, max_row=HR + 10))
 style_bar(ch2, "Top 10 products")
 ch2.x_axis.scaling.orientation = "maxMin"
+ch2.y_axis.crosses = "max"
 ws.add_chart(ch2, "H11")
 
 ch3 = BarChart()
@@ -492,16 +495,18 @@ ch3.add_data(Reference(ws_calc, min_col=14, min_row=HR, max_row=HR + NC), titles
 ch3.set_categories(Reference(ws_calc, min_col=13, min_row=HR + 1, max_row=HR + NC))
 style_bar(ch3, "Top countries outside the UK")
 ch3.x_axis.scaling.orientation = "maxMin"
+ch3.y_axis.crosses = "max"
 ws.add_chart(ch3, "B27")
 
 ch4 = LineChart()
 ch4.add_data(Reference(ws_calc, min_col=3, min_row=HR, max_row=m_last), titles_from_data=True)
 ch4.set_categories(Reference(ws_calc, min_col=1, min_row=HR + 1, max_row=m_last))
-ch4.title, ch4.legend, ch4.width, ch4.height = "Orders by month", None, 15.2, 7.6
+ch4.title, ch4.legend, ch4.width, ch4.height = "Orders by month", None, 15.2, 7.4
 ch4.x_axis.delete = False
 ch4.y_axis.delete = False
 ch4.series[0].graphicalProperties.line.solidFill = "C55A11"
 ch4.series[0].graphicalProperties.line.width = 28000
+ch4.series[0].smooth = False
 ws.add_chart(ch4, "H27")
 
 ws.print_area = "B2:M42"
