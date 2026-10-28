@@ -1,0 +1,12 @@
+# scratch and temp
+*.tmp
+~$*
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
+.venv/
+# the full 23 MB source file is not stored here
+Online Retail.xlsx
+online_retail.zip
+_work/
