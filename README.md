@@ -83,7 +83,7 @@ R06 (most common spelling per StockCode) needs a Group By on StockCode and Descr
 
 ## How AI helped
 
-An AI coding tool wrote the Python scripts and the first drafts of these documents. It also drove desktop Excel through its automation interface to add the dynamic-array formulas, recalculate and export the screenshots. I directed the work and checked the numbers (see Verification).
+An AI coding assistant wrote the Python scripts and the first drafts of these documents. It also drove desktop Excel through its automation interface to add the dynamic-array formulas, recalculate and export the screenshots. I directed the work and checked the numbers (see Verification).
 
 ## What broke and how it was fixed
 
