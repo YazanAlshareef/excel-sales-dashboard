@@ -47,7 +47,7 @@ Alt sequences are pressed one key after another, not held together. Press Alt, r
 | `Alt+Down` on a header | Open that column's filter menu. |
 | `Alt+A`, `V`, `V` | Open Data Validation (this is how the dropdowns are made). |
 | `Alt+A`, `M` | Remove Duplicates. |
-| `Alt+A`, `R` | Refresh All (matters if you build the Power Query version). |
+| `Alt+A`, `R`, `A` | Refresh All (matters if you build the Power Query version). |
 | `Alt+N`, `V` | Insert a PivotTable. |
 | `Alt+H`, `O`, `I` | Auto-fit column width. |
 | `Alt+W`, `F`, `F` | Freeze panes at the selected cell. |
