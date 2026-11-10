@@ -98,7 +98,7 @@ An AI coding assistant wrote the Python scripts and the first drafts of these do
 
 Run on the final file with desktop Excel 365:
 - Error scan of every used cell on every sheet for `#REF!`, `#N/A`, `#VALUE!`, `#DIV/0!`, `#NAME?`, `#NUM!`, `#NULL!`: **none found**. The scan ran with the dropdowns on All and again after switching to Germany.
-- Dashboard KPIs match an independent pandas calculation on the Clean data: net revenue 171,346.13, 302 orders, Germany net revenue 1,256.50 with 4 orders.
+- Dashboard KPIs match a pandas calculation on the Clean data that I ran by hand (that check script is not included in the repo): net revenue 171,346.13, 302 orders, Germany net revenue 1,256.50 with 4 orders.
 - Cleaning Log reconciliation shows OK.
 
 Not verified: LibreOffice, Excel for Mac, Excel for the web, older Excel versions, the Power Query steps, and the dropdowns used by hand with the keyboard. The filter tests set the dropdown cells through automation.
@@ -110,7 +110,7 @@ Open `excel-sales-dashboard.xlsx` in Excel 365 or 2021+. Go to the Dashboard she
 To rebuild from source (Windows, desktop Excel installed):
 
 ```
-pip install pandas openpyxl pywin32 pymupdf
+pip install -r requirements.txt
 python scripts/prepare_data.py "path/to/Online Retail.xlsx"
 python scripts/build_workbook.py _work/stage1.xlsx
 python scripts/finish_in_excel.py _work/stage1.xlsx excel-sales-dashboard.xlsx screenshots
