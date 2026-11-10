@@ -2,8 +2,11 @@
 
 Usage: python scripts/prepare_data.py "path/to/Online Retail.xlsx"
 Output: data/raw_sample.csv  (rows copied as-is, nothing cleaned)
+The 8,495-row sample only comes out with the full 23 MB source file and seed 42.
+The source is not stored in this repo; download it from the UCI repository.
 """
 import sys
+from pathlib import Path
 import pandas as pd
 
 SEED = 42
@@ -13,5 +16,6 @@ src = sys.argv[1]
 df = pd.read_excel(src, dtype={"InvoiceNo": str, "StockCode": str})
 invoices = df["InvoiceNo"].drop_duplicates().sample(N_INVOICES, random_state=SEED)
 sample = df[df["InvoiceNo"].isin(invoices)]  # keeps original row order
-sample.to_csv("data/raw_sample.csv", index=False)
+out = Path(__file__).resolve().parent.parent / "data" / "raw_sample.csv"
+sample.to_csv(out, index=False)
 print(f"source rows {len(df)}, sample rows {len(sample)}, invoices {N_INVOICES}")
