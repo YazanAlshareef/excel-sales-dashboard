@@ -7,7 +7,7 @@ Try them with the keyboard (see [KEYBOARD.md](KEYBOARD.md)). If a check number d
 ## 1. Count and look
 
 How many rows does Raw have? Which columns have blank cells? Count the blanks in CustomerID and in Description.
-Check: 8,495 rows. Raw has 2,241 rows with a blank CustomerID that become GUEST in rule R08, plus other blanks you may find. Rule R09 found 0 blank descriptions.
+Check: 8,495 rows. Raw has 2,298 blank CustomerIDs and 23 blank Descriptions. The workbook shows 2,241 GUEST fills (R08) and 0 blank descriptions (R09) because those rules run after the removal rules R01 to R04 have taken out some of those rows.
 
 ## 2. Remove duplicates
 
@@ -32,7 +32,7 @@ Check: 13 rows removed (R04). After tasks 2 to 5, you should have 8,335 rows. Th
 ## 6. Tidy text
 
 Trim spaces in Description with `TRIM`. Rename the country EIRE to Ireland. Replace blank CustomerID with GUEST.
-Check: R05 trimmed 1,994 descriptions, R07 renamed 65 rows, R08 filled 2,241 rows.
+Check: R05 trimmed 1,994 descriptions, R07 renamed 65 rows, R08 filled 2,241 rows. These counts are on the data left after tasks 2 to 5. Raw itself has 67 EIRE rows and 2,298 blank CustomerIDs, so do this task after removing rows, not before.
 
 ## 7. Add columns
 
