@@ -67,7 +67,7 @@ def main(src, dst, shots):
         mf.Range("C8").Formula2 = ('=TAKE(SORTBY(FILTER(CHOOSE({1,2,3,4},cInvoice,cDesc,cQty,cRevenue),'
                                    '(cCountry=B4)*(cType="Sale")),'
                                    'FILTER(cRevenue,(cCountry=B4)*(cType="Sale")),-1),15)')
-        mf.Range("C8").Select
+        mf.Range("C8").Select()
         mf.Columns("A:A").ColumnWidth = 48
         mf.Columns("B:B").ColumnWidth = 16
         mf.Columns("C:F").ColumnWidth = 22
