@@ -142,6 +142,7 @@ Not verified: LibreOffice, Excel for Mac, Excel for the web, older Excel version
 - The Metric dropdown (Revenue or Units) changes only the top products and top countries charts.
 - The Summary sheet ignores the dropdowns.
 - Older Excel (2019 and earlier) shows `#NAME?` on the Modern Functions sheet. Nothing else uses those functions.
+- Chart polish I saw in the screenshot and did not fix: the chart titles sit on top of the plot area (visible on the two horizontal bar charts), the gridlines are heavy black, and long product names are cut off at 30 characters.
 - Customer type is Registered or Guest, taken from whether CustomerID is blank. It is not a customer segment.
 
 ## Files
