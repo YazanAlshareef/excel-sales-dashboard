@@ -10,8 +10,11 @@ from pathlib import Path
 import pandas as pd
 
 SEED = 42
+EXPECTED_ROWS = 8495  # only the full source file with this seed gives this
 N_INVOICES = 400  # whole invoices, so duplicate lines and returns stay realistic
 
+if len(sys.argv) != 2:
+    sys.exit('Usage: python scripts/prepare_data.py "path/to/Online Retail.xlsx"')
 src = sys.argv[1]
 df = pd.read_excel(src, dtype={"InvoiceNo": str, "StockCode": str})
 invoices = df["InvoiceNo"].drop_duplicates().sample(N_INVOICES, random_state=SEED)
@@ -19,3 +22,5 @@ sample = df[df["InvoiceNo"].isin(invoices)]  # keeps original row order
 out = Path(__file__).resolve().parent.parent / "data" / "raw_sample.csv"
 sample.to_csv(out, index=False)
 print(f"source rows {len(df)}, sample rows {len(sample)}, invoices {N_INVOICES}")
+if len(sample) != EXPECTED_ROWS:
+    print(f"warning: expected {EXPECTED_ROWS} sample rows, got {len(sample)}. Check the source file.", file=sys.stderr)
