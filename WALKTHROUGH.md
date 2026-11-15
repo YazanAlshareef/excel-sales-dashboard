@@ -1,13 +1,13 @@
 # Walkthrough
 
-Each file in this repo, in plain English. Read the README first for the big picture.
+This page explains each file in the repo. Read the README first.
 
 ## Top level
 
 | File | What it is |
 |---|---|
 | `excel-sales-dashboard.xlsx` | The finished workbook. Open this one. |
-| `README.md` | Landing page: what the project is, data source and licence, cleaning rules, what is live and what is pre-computed, verification, limits. |
+| `README.md` | The overview: data source and licence, cleaning rules, what is live and what is pre-computed, verification and limits. |
 | `WALKTHROUGH.md` | This file. |
 | `KEYBOARD.md` | Keyboard shortcuts for working with the workbook. |
 | `PRACTICE.md` | Ten tasks to redo by hand from the Raw sheet. |
@@ -16,11 +16,11 @@ Each file in this repo, in plain English. Read the README first for the big pict
 
 ## data/
 
-`data/raw_sample.csv` is the Raw sheet as a CSV: 8,495 rows from 400 whole invoices of the UCI Online Retail dataset, picked with random seed 42. It is the only data input to the workbook build. The full 541,909-row source file is not in the repo; download it from the UCI page linked in the README.
+`data/raw_sample.csv` is the Raw sheet as a CSV: 8,495 rows from 400 whole invoices of the UCI Online Retail dataset, picked with random seed 42. It is the only data input to the workbook build. The full source file is not in the repo. Download it from the UCI page linked in the README.
 
 ## scripts/
 
-The workbook is built in three steps. Run them in this order.
+The workbook is built in three steps, run in this order.
 
 1. `scripts/prepare_data.py`
    - Reads the full `Online Retail.xlsx` you downloaded.
@@ -35,19 +35,19 @@ The workbook is built in three steps. Run them in this order.
 
 3. `scripts/finish_in_excel.py`
    - Opens that first workbook in desktop Excel through pywin32.
-   - Adds the Modern Functions sheet (`XLOOKUP`, `UNIQUE`, `SORT`, `FILTER`, `SORTBY`, `TAKE`). Excel has to write these itself so that they spill properly.
-   - Recalculates, scans every sheet for error values, sets the dropdowns to All and then to Germany to test them, and exports the two dashboard PNGs.
+   - Adds the Modern Functions sheet (`XLOOKUP`, `UNIQUE`, `SORT`, `FILTER`, `SORTBY`, `TAKE`). Excel has to write these itself, otherwise they do not spill.
+   - Recalculates and scans every sheet for error values. It sets the dropdowns to All and then to Germany as a test, and exports the two dashboard PNGs.
    - Saves the final `.xlsx`.
    - Usage: `python scripts/finish_in_excel.py _work/stage1.xlsx excel-sales-dashboard.xlsx screenshots`
 
-Why two stages: openpyxl can write formulas and charts but cannot write the dynamic-array formulas in a form Excel treats as spilling. Real Excel can.
+Why two stages: openpyxl writes formulas and charts, but not dynamic-array formulas in a form Excel treats as spilling. Real Excel does.
 
 ## screenshots/
 
 - `dashboard-all.png`: the Dashboard with every dropdown on All.
 - `dashboard-germany.png`: the Dashboard with Country set to Germany.
 
-Both are made by `finish_in_excel.py`: Excel prints the Dashboard sheet to PDF, and PyMuPDF turns the PDF into a PNG.
+`finish_in_excel.py` makes both. Excel prints the Dashboard sheet to PDF and PyMuPDF turns the PDF into a PNG.
 
 ## Inside the workbook
 
@@ -60,7 +60,7 @@ Sheet order in the file: Dashboard, Summary, Clean, Cleaning Log, Raw, Calc, Lis
 - **Raw**: untouched sample.
 - **Calc**: helper tables behind the charts. The Dashboard dropdowns feed the criteria cells at the top of this sheet.
 - **Lists**: the values the dropdowns offer.
-- **Modern Functions**: the Excel 365 formulas, kept apart so the rest of the workbook still works in older Excel.
+- **Modern Functions**: the Excel 365 formulas. I kept them on their own sheet so the rest of the workbook still works in older Excel.
 
 Named ranges you will see in formulas: `cInvoice`, `cStock`, `cDesc`, `cQty`, `cDate`, `cPrice`, `cCust`, `cCountry`, `cType`, `cRevenue`, `cMonth`, `cCustType`, `cOrderFlag` (columns of `tblClean`); `lstCountry`, `lstMonth`, `lstCust`, `lstMetric` (dropdown lists); `SelCountry`, `SelMonth`, `SelCust`, `SelMetric` (the Dashboard dropdown cells); `CritCountry`, `CritMonth`, `CritCust` (the same choices turned into `SUMIFS` criteria, with All becoming `*`); `LookupCountry` (the Summary lookup cell).
 
@@ -71,4 +71,4 @@ Named ranges you will see in formulas: `cInvoice`, `cStock`, `cDesc`, `cQty`, `c
 3. `SUMIFS` formulas on Calc and on the Dashboard add up `cRevenue` and `cOrderFlag` where `cCountry` matches the criterion.
 4. The charts read the Calc tables, so they redraw.
 
-If you can explain those four steps, you can explain the whole dashboard.
+Those four steps are the whole mechanism.
