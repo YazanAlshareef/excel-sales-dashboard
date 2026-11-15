@@ -9,7 +9,9 @@ Everything the workbook shows is either:
   * live    - an Excel formula (Clean columns J-N, Summary, Calc, Dashboard)
 """
 import sys
+from pathlib import Path
 import pandas as pd
+from cleaning import COLS8, RULES, REMOVE_RULES, clean, load_raw
 from openpyxl import Workbook
 from openpyxl.chart import BarChart, LineChart, Reference
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
@@ -20,89 +22,20 @@ from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.worksheet.properties import PageSetupProperties
 from openpyxl.worksheet.table import Table, TableStyleInfo
 
+if len(sys.argv) != 2:
+    sys.exit("Usage: python scripts/build_workbook.py _work/stage1.xlsx")
 OUT = sys.argv[1]
+DATA = Path(__file__).resolve().parent.parent / "data" / "raw_sample.csv"
 
-# ---------------------------------------------------------------- rules
-SERVICE_CODES = {"POST", "DOT", "M", "C2", "AMAZONFEE", "BANK CHARGES", "CRUK", "S", "B", "PADS", "D"}
-COUNTRY_FIX = {"EIRE": "Ireland", "RSA": "South Africa", "USA": "United States"}
-RULES = [
-    ("R01", "Remove exact duplicate row", "Row removed. All 8 fields equal to an earlier row; first copy kept."),
-    ("R02", "Remove non-product line", "Row removed. StockCode is a service code: " + ", ".join(sorted(SERVICE_CODES)) + "."),
-    ("R03", "Remove stock adjustment", "Row removed. Quantity <= 0 on an invoice that does not start with C (not a customer return)."),
-    ("R04", "Remove zero or negative price", "Row removed. UnitPrice <= 0."),
-    ("R05", "Trim spaces in Description", "Leading/trailing spaces cut, repeated inner spaces collapsed to one."),
-    ("R06", "Standardise Description per StockCode", "Description replaced by the most common spelling for that StockCode."),
-    ("R07", "Rename country", "EIRE -> Ireland (also RSA, USA if present)."),
-    ("R08", "Fill missing CustomerID", "Blank CustomerID set to GUEST. Other IDs stored as text."),
-    ("R09", "Fill missing Description", "Blank Description set to UNKNOWN."),
-]
-REMOVE_RULES = ["R01", "R02", "R03", "R04"]
-
-raw = pd.read_csv("data/raw_sample.csv", dtype={"InvoiceNo": str, "StockCode": str}, parse_dates=["InvoiceDate"])
-raw["raw_row"] = raw.index + 2  # row number on the Raw sheet
-log = []  # (raw_row, invoice, stock, rule, field, old, new)
-
-
-def add_log(rows, rule, field, old, new):
-    for _, r in rows.iterrows():
-        log.append((int(r.raw_row), r.InvoiceNo, r.StockCode, rule, field,
-                    old(r) if callable(old) else old, new(r) if callable(new) else new))
-
-
-df = raw.copy()
-cols8 = ["InvoiceNo", "StockCode", "Description", "Quantity", "InvoiceDate", "UnitPrice", "CustomerID", "Country"]
-
-
-def drop(mask, rule):
-    global df
-    hit = df[mask(df)]
-    add_log(hit, rule, "row", lambda r: f"Qty {r.Quantity}, Price {r.UnitPrice}", "row removed")
-    df = df.drop(hit.index)
-
-
-drop(lambda d: d.duplicated(subset=cols8, keep="first"), "R01")
-drop(lambda d: d.StockCode.isin(SERVICE_CODES), "R02")
-drop(lambda d: (d.Quantity <= 0) & ~d.InvoiceNo.str.startswith("C"), "R03")
-drop(lambda d: d.UnitPrice <= 0, "R04")
-
-# R05 trim
-desc_old = df.Description.copy()
-desc_new = df.Description.str.replace(r"\s+", " ", regex=True).str.strip()
-chg = df[desc_old.notna() & (desc_old != desc_new)]
-add_log(chg, "R05", "Description", lambda r: repr(desc_old[r.name]), lambda r: repr(desc_new[r.name]))
-df["Description"] = desc_new
-
-# R06 most common description per stock code (ties: alphabetical)
-mode = (df.dropna(subset=["Description"]).groupby("StockCode")["Description"]
-        .agg(lambda s: sorted(s.value_counts().loc[lambda v: v == v.max()].index)[0]))
-std = df.StockCode.map(mode)
-chg = df[df.Description.notna() & std.notna() & (df.Description != std)]
-add_log(chg, "R06", "Description", lambda r: r.Description, lambda r: std[r.name])
-df.loc[chg.index, "Description"] = std[chg.index]
-
-# R07 country
-chg = df[df.Country.isin(COUNTRY_FIX)]
-add_log(chg, "R07", "Country", lambda r: r.Country, lambda r: COUNTRY_FIX[r.Country])
-df["Country"] = df.Country.replace(COUNTRY_FIX)
-
-# R08 customer id -> text or GUEST
-chg = df[df.CustomerID.isna()]
-add_log(chg, "R08", "CustomerID", "(blank)", "GUEST")
-df["CustomerID"] = df.CustomerID.map(lambda v: "GUEST" if pd.isna(v) else str(int(v)))
-
-# R09 description blank
-chg = df[df.Description.isna()]
-add_log(chg, "R09", "Description", "(blank)", "UNKNOWN")
-df["Description"] = df.Description.fillna("UNKNOWN")
-
-df = df.reset_index(drop=True)
+# ---------------------------------------------------------------- data and rules
+raw = load_raw(DATA)
+df, log = clean(raw)
 df["Month"] = df.InvoiceDate.dt.strftime("%Y-%m")
 df["Revenue"] = df.Quantity * df.UnitPrice
 months = sorted(df.Month.unique())
 countries = df.groupby("Country").Revenue.sum().sort_values(ascending=False).index.tolist()
 countries_alpha = sorted(countries)
 products = sorted(df.StockCode.unique())
-log.sort(key=lambda t: (t[0], t[3]))
 print("raw", len(raw), "clean", len(df), "log", len(log), "products", len(products), "countries", len(countries))
 
 # ---------------------------------------------------------------- styles
@@ -152,8 +85,8 @@ def header(ws, row, col, labels):
 
 
 # ---------------------------------------------------------------- Raw (untouched)
-header(ws_raw, 1, 1, cols8)
-for i, r in enumerate(raw[cols8].itertuples(index=False), start=2):
+header(ws_raw, 1, 1, COLS8)
+for i, r in enumerate(raw[COLS8].itertuples(index=False), start=2):
     ws_raw.cell(i, 1, r[0])
     ws_raw.cell(i, 2, r[1])
     if not pd.isna(r[2]):
