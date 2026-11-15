@@ -145,6 +145,14 @@ Not verified: LibreOffice, Excel for Mac, Excel for the web, older Excel version
 - Chart polish I saw in the screenshot and did not fix: the chart titles sit on top of the plot area (visible on the two horizontal bar charts), the gridlines are heavy black, and long product names are cut off at 30 characters.
 - Customer type is Registered or Guest, taken from whether CustomerID is blank. It is not a customer segment.
 
+## Diagrams
+
+- [Components](docs/diagrams/components.md): scripts, data files and tests.
+- [Build flow](docs/diagrams/build-flow.md): call order from CSV to finished workbook.
+- [Cleaning rules](docs/diagrams/cleaning-rules.md): order of R01 to R09.
+- [Dashboard filter chain](docs/diagrams/dashboard-filter.md): dropdown to Calc to charts.
+- [Workbook sheets](docs/diagrams/workbook-sheets.md): how the sheets relate.
+
 ## Files
 
 [WALKTHROUGH.md](WALKTHROUGH.md) explains each file, [KEYBOARD.md](KEYBOARD.md) covers keyboard use, and [PRACTICE.md](PRACTICE.md) has ten tasks to redo from the Raw sheet.
