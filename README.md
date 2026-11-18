@@ -112,10 +112,6 @@ The Python script does the cleaning in this file. The same steps can be done in 
 
 R06 (most common spelling per StockCode) needs a Group By on StockCode and Description, then a merge. It is the hardest step to do in Power Query.
 
-## How AI helped
-
-An AI coding assistant wrote the Python scripts and the first drafts of these documents. It also drove desktop Excel through its automation interface to add the dynamic-array formulas, recalculate and export the screenshots. I directed the work and checked the numbers (see Verification).
-
 ## What broke and how I fixed it
 
 - The first screenshots were blank. Excel's copy-as-picture does not work while Excel is hidden. I now export the Dashboard sheet to PDF and render that to PNG.
