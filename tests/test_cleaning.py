@@ -71,3 +71,11 @@ def test_build_script_without_argument_prints_usage():
     r = subprocess.run([sys.executable, str(ROOT / "scripts" / "build_workbook.py")],
                        capture_output=True, text=True)
     assert r.returncode != 0 and "Usage" in r.stderr
+
+
+def test_sample_rule_counts_match_readme():
+    out, log = clean(load_raw(ROOT / "data" / "raw_sample.csv"))
+    counts = pd.Series([t[3] for t in log]).value_counts().to_dict()
+    assert counts == {"R01": 69, "R02": 51, "R03": 27, "R04": 13,
+                      "R05": 1994, "R06": 85, "R07": 65, "R08": 2241}
+    assert len(out) == 8335 and len(log) == 4545
